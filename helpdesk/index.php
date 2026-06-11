@@ -2,6 +2,12 @@
     session_start();
     require_once 'conexao.php'; 
     
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    // Limpa todas as variáveis de sessão ativas ao entrar na tela de login
+    session_unset();
+
     if (empty($_SESSION['csrf_token_login'])) {
         $_SESSION['csrf_token_login'] = bin2hex(random_bytes(32));
     }

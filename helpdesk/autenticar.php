@@ -72,6 +72,6 @@ $_SESSION['id_empresa'] = (int) $user['empresa'];
 
 unset($_SESSION['csrf_token_login']);
 
-header('Location: painel');
+header('Location: painel/index.php');
 exit;
 ?>
