@@ -8,12 +8,26 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST'){
     exit;
 }
 
+// Proteção CSRF: valida token do Formulario
+$token_post = $_POST['csrf_token'] ?? '';
+$token_sessao = $_SESSION['csrf_token_login'] ?? '';
+if(empty($token_post) || !hash_equals((string) $token_sessao, (string) $token_post)){
+    header('Location: index.php?erro=1');
+    exit();
+}
+
 // ─── CAPTURA OS DADOS DO FORMULÁRIO ──────────────────────
-$usuario = trim($_POST['usuario'] ?? '');
-$senha   = $_POST['senha'] ?? '';
+$usuario = trim((string) ($_POST['usuario'] ?? ''));
+$senha   = (string) ($_POST['senha'] ?? '');
 
 // ─── VALIDA SE OS CAMPOS ESTÃO PREENCHIDOS ────────────────
-if(empty($usuario) || empty($senha)){
+if(!filter_var($usuario, FILTER_VALIDATE_EMAIL) || strlen($usuario) > 100){
+    header('Location: index.php?erro=1');
+    exit;
+}
+
+// Limite de tamanho na senha (bcrypt usa até 72 bytes; evita payload gigante)
+if(strlen($senha) > 256 || $senha === ''){
     header('Location: index.php?erro=1');
     exit;
 }
@@ -47,12 +61,16 @@ if(!password_verify($senha, $user['senha'])){
     exit;
 }
 
+session_regenerate_id(true);
+
 // ─── SALVA OS DADOS NA SESSÃO ─────────────────────────────
 $_SESSION['id'] = (int) $user['id'];
 $_SESSION['nome'] = $user['nome'];
 $_SESSION['email'] = $usuario;
 $_SESSION['nivel'] = $user['nivel'];
 $_SESSION['id_empresa'] = (int) $user['empresa'];
+
+unset($_SESSION['csrf_token_login']);
 
 header('Location: painel');
 exit;

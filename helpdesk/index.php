@@ -1,5 +1,10 @@
 <?php 
+    session_start();
     require_once 'conexao.php'; 
+    
+    if (empty($_SESSION['csrf_token_login'])) {
+        $_SESSION['csrf_token_login'] = bin2hex(random_bytes(32));
+    }
 
     // Usuario padrão administrador (se não existir nenhum com nível Administrador)
     $stmt = $pdo->query("SELECT id FROM usuarios WHERE nivel = 'Administrador' LIMIT 1");
@@ -49,6 +54,7 @@
                 </div>
 
                 <form class="login-form" action="autenticar.php" method="POST">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token_login']); ?>" >
                     <div class="form-group">
                         <label for="usuario">E-mail</label>
                         <div class="input-group">
@@ -104,7 +110,7 @@
             </div>
 
             <div class="login-info">
-                <h2>Bem-vindo ao <?php echo $nome_sistema; ?></h2>
+                <h2>Bem-vindo ao <?php echo htmlspecialchars($nome_sistema); ?></h2>
                 <p>Gerencie seus chamados e solicitações de suporte de forma eficiente</p>
                 <ul class="features-list">
                     <li>
