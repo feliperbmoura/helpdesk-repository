@@ -203,6 +203,12 @@
     <script src="js/mensagens.js"></script>
     <script src="js/flatpickr-config.js"></script>
     <script src="js/scripts.js"></script>
-    <script src="js/login.js"></script>
+    <script src="js/login.js"></script>7
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            Mensagens.exibirRetornoLogin();
+        });
+
+    </script>
 </body>
 </html>
