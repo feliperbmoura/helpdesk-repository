@@ -22,8 +22,11 @@ if (empty($token_post) || !hash_equals((string)$token_sessao, (string)$token_pos
     exit;
 }
 
+// entrada: normaliza e valida (não altera a senha - não usar trim na senha)
 $usuario = trim((string)($_POST['usuario'] ?? ''));
 $senha   = (string)($_POST['senha'] ?? '');
+$lembrar = isset($_POST['lembrar']) ? 'Sim' : 'Não';
+$_SESSION['lembrar_login'] = $lembrar;
 
 if (!filter_var($usuario, FILTER_VALIDATE_EMAIL) || strlen($usuario) > 100) {
     $_SESSION['flash'] = ['tipo' => 'erro', 'codigo' => 'csrf_invalido'];
