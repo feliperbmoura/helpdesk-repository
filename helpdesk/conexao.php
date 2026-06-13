@@ -1,6 +1,12 @@
 <?php
 
-$modo_teste = 'Sim'; // essa variável serve para limitar o usuario a fazer testes no sistema
+$modo_teste = 'Nao'; // essa variável serve para limitar o usuario a fazer testes no sistema
+
+// Credencias padrão para o modo teste (apenas DEV)
+$teste_email = 'felipemoura10k@gmail.com';
+$teste_senha = '123';
+
+
 
 date_default_timezone_set('America/Sao_Paulo');
 

@@ -79,6 +79,7 @@
                                 placeholder="Digite seu e-mail"
                                 required
                                 autocomplete="email"
+                                value="<?php echo ($modo_teste === 'Sim') ? htmlspecialchars($teste_email) : '' ?>"
                             >
                         </div>
                     </div>
@@ -97,6 +98,7 @@
                                 placeholder="Digite sua senha"
                                 required
                                 autocomplete="current-password"
+                                value="<?php echo ($modo_teste === 'Sim') ? htmlspecialchars($teste_senha) : '' ?>"
                             >
                         </div>
                     </div>
@@ -209,12 +211,90 @@
     <script src="js/mensagens.js"></script>
     <script src="js/flatpickr-config.js"></script>
     <script src="js/scripts.js"></script>
-    <script src="js/login.js"></script>7
+    <script src="js/login.js"></script>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function(){
             Mensagens.exibirRetornoLogin();
         });
+    </script>
 
+    <script>
+
+        // CHECKBOX EMAIL
+        document.addEventListener('DOMContentLoaded', function(){
+            const chk = document.getElementById('lembrar');
+            const inputEmail = document.getElementById('usuario');
+
+            // ao abrir: tenta carregar email salvo
+
+            const savedEmail = localStorage.getItem('login_email');
+            if (savedEmail){
+                inputEmail.value = savedEmail;
+                chk.checked = true;
+            }
+
+            // se estiver em modo teste, mantém o padrão do teste
+
+            const modoTeste = <?php echo json_encode($modo_teste); ?>
+            if (modoTeste === 'Sim'){
+                chk.checked = true;
+            }
+
+
+            // ao enviar: se lembrar marcado, salva email; senão remove
+
+            const form = document.querySelector('form.login-form');
+            form.addEventListener('submit', function(){
+                if (chk.checked){
+                    localStorage.setItem('login_email', inputEmail.value.trim());
+                } else{
+                    localStorage.removeItem('login_email');
+                }
+            });
+        });
+
+
+        // CHECKBOX SENHA
+
+        document.addEventListener('DOMContentLoaded', function(){
+            Mensagens.exibirRetornoLogin();
+           
+            const chk = document.getElementById('lembrar');
+            const inputEmail = document.getElementById('usuario');
+            const inputSenha = document.getElementById('senha');
+
+           // ao abrir: carrega dados salvos
+
+            const saved = localStorage.getItem('login_dados');
+            if(saved){
+                try{
+                const obj = JSON.parse(saved);
+                if(obj.email) inputEmail.value = obj.email;
+                if(obj.senha) inputSenha.value = obj.senha;
+                chk.checked = true;
+                } catch (e){}
+            }
+
+            const modoTeste = <?php echo json_encode($modo_teste) ?>
+            if (modoTeste === 'Sim'){
+                chk.checked = true;
+            }
+
+            // ao enviar: salva ou remove
+
+            const form = document.querySelector('form.login-form');
+            form.addEventListener('submit', function(){
+                if(chk.checked){
+                    localStorage.setItem('login_dados', JSON.stringify({
+                        email: inputEmail.value.trim(),
+                        senha: inputSenha.value
+                    }));
+                } else {
+                    localStorage.removeItem('login_dados');
+                }
+            });
+        });
     </script>
 
 </body>

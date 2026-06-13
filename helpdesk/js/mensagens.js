@@ -103,7 +103,7 @@ const Mensagens = {
 
     // Exibe mensagem de retorno do login conforme parâmentro da URL
     // USO: Mensagens.exibirRetornoLogin()
-    // ELE RECURPERA A SESSÂO
+    // ELE RECURPERA A SESSÂO e não retorma o tipo do erro na URL, ou seja ele nao utiliza get
     exibirRetornoLogin(){
         if (!window.LOGIN_FLASH) return;
 
