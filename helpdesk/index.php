@@ -1,35 +1,39 @@
 <?php 
-    session_start();
-    require_once 'conexao.php'; 
-    
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
-    }
-    // Limpa todas as variáveis de sessão ativas ao entrar na tela de login
-    session_unset();
+   session_start();
+   require_once 'conexao.php';
 
-    if (empty($_SESSION['csrf_token_login'])) {
-        $_SESSION['csrf_token_login'] = bin2hex(random_bytes(32));
-    }
+   // ✅ LEIA o flash ANTES de limpar a sessão
+   $flash = $_SESSION['flash'] ?? null;
+    unset($_SESSION['flash']);
 
-    // Usuario padrão administrador (se não existir nenhum com nível Administrador)
-    $stmt = $pdo->query("SELECT id FROM usuarios WHERE nivel = 'Administrador' LIMIT 1");
-    if(!$stmt->fetch()){
-        $senha_hash = password_hash($senha_padrao, PASSWORD_DEFAULT);
-        $stmt = $pdo->prepare("
-            INSERT INTO usuarios (nome, email, senha, nivel, ativo, empresa)
-            VALUES (:nome, :email, :senha, :nivel, :ativo, :empresa)
-        ");
 
-        $stmt->execute([
-            ':nome' => 'Administrador',
-            ':email' => $email_sistema,
-            ':senha' => $senha_hash,
-            ':ativo' => 'Sim',
-            ':nivel' => 'Administrador',
-            ':empresa' => 0
-        ]);
-    }
+
+
+
+
+   // ✅ Gera token CSRF (sem apagar a sessão inteira)
+   if (empty($_SESSION['csrf_token_login'])) {
+       $_SESSION['csrf_token_login'] = bin2hex(random_bytes(32));
+   }
+
+   // Usuário padrão administrador
+   $stmt = $pdo->query("SELECT id FROM usuarios WHERE nivel = 'Administrador' LIMIT 1");
+   if (!$stmt->fetch()) {
+       $senha_hash = password_hash($senha_padrao, PASSWORD_DEFAULT);
+       $stmt = $pdo->prepare("
+           INSERT INTO usuarios (nome, email, senha, nivel, ativo, empresa)
+           VALUES (:nome, :email, :senha, :nivel, :ativo, :empresa)
+       ");
+       $stmt->execute([
+           ':nome'    => 'Administrador',
+           ':email'   => $email_sistema,
+           ':senha'   => $senha_hash,
+           ':ativo'   => 'Sim',
+           ':nivel'   => 'Administrador',
+           ':empresa' => 0
+       ]);
+   }
+
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -191,7 +195,9 @@
             </div>
         </div>
     </div>
-
+    <script>
+        window.LOGIN_FLASH = <?php echo json_encode($flash); ?>;
+    </script>
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <!-- SweetAlert2 -->
@@ -210,5 +216,6 @@
         });
 
     </script>
+
 </body>
 </html>
